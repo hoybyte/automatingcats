@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import PostCard from '../components/PostCard.astro';
 
 const siteName = "Automating Cats";
 
@@ -20,6 +22,16 @@ const categories = [
     icon: "✎",
   },
 ];
+
+const recentPosts = (await getCollection(
+  'blog',
+  ({ data }) => !data.draft
+))
+  .sort((a, b) =>
+  b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+ )
+  .slice(0, 3);
+
 ---
 
 <BaseLayout
@@ -66,6 +78,24 @@ const categories = [
       share the challenges I encounter, and reflect
       on the things that matter along the way.
     </p>
+  </section>
+
+  <!--Latest Writing Section -->
+  <<section id="lastest" class="latest-writing">
+    <div class="section-heading">
+      <h2>Latest Writing</h2>
+      <a href="/blog/">View all writing</a>
+    </div>
+
+    {recentPosts.length > 0 ? (
+    <div class="recent-posts">
+      {recentPosts.map((post) => (
+      <PostCard post={post} />
+      ))}
+    </div>
+    ) : (
+    <p>New journal entries are coming soon</p>
+    )}
   </section>
 </BaseLayout>
 

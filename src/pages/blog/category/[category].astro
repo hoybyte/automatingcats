@@ -1,0 +1,86 @@
+
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import PostCard from "../../../components/PostCard.astro";
+
+import {
+  categories,
+  getCategoryUrl,
+} from "../../../lib/categories";
+
+export function getStaticPaths() {
+  return categories.map((category) => ({
+    params: {
+      category: category.slug,
+    },
+    props: {
+      category,
+    },
+  }));
+}
+
+const { category } = Astro.props;
+
+const posts = (await getCollection(
+  "blog",
+  ({ data }) =>
+    !data.draft && data.category === category.name
+)).sort(
+  (a, b) =>
+    b.data.pubDate.valueOf() -
+    a.data.pubDate.valueOf()
+);
+---
+
+<BaseLayout
+  title={category.name}
+  description={category.description}
+>
+  <section class="category-header">
+    <a href="/blog/" class="back-link">
+      ← All articles
+    </a>
+
+    <p class="eyebrow">JOURNAL CATEGORY</p>
+
+    <h1>{category.name}<span>.</span></h1>
+
+    <p class="intro">{category.description}</p>
+
+    <p class="article-count">
+      {posts.length}
+      {posts.length === 1 ? "article" : "articles"}
+    </p>
+  </section>
+
+  <nav class="category-navigation" aria-label="Journal categories">
+    <a href="/blog/">All Articles</a>
+
+    {categories.map((item) => (
+      <a
+        href={getCategoryUrl(item.slug)}
+        class={item.slug === category.slug ? "active" : ""}
+        aria-current={item.slug === category.slug ? "page" : undefined}
+      >
+        {item.name}
+      </a>
+    ))}
+  </nav>
+
+  <section class="category-posts">
+    {posts.length > 0 ? (
+      <div class="recent-posts">
+        {posts.map((post) => (
+          <PostCard post={post} />
+        ))}
+      </div>
+    ) : (
+      <p class="empty-category">
+        No articles in this category yet.
+        Check back soon!
+      </p>
+    )}
+  </section>
+</BaseLayout>
+

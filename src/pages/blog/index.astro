@@ -2,6 +2,7 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { categories, getCategoryUrl } from "../../lib/categories";
 
 const posts = (await getCollection(
   "blog",
@@ -24,6 +25,18 @@ const posts = (await getCollection(
       troubleshooting experiences, and life.
     </p>
   </section>
+
+  <nav class="category-navigation" aria-label="Journal categories">
+    <a href="/blog/" class="active" aria-current="page">
+      All Articles
+    </a>
+
+    {categories.map((category) => (
+      <a href={getCategoryUrl(category.slug)}>
+        {category.name}
+      </a>
+    ))}
+  </nav>
 
   <section class="journal-list">
     {posts.length === 0 ? (

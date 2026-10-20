@@ -2,26 +2,9 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import PostCard from '../components/PostCard.astro';
+import { categories, getCategoryUrl } from "..//lib/categories";
 
 const siteName = "Automating Cats";
-
-const categories = [
-  {
-    title: "Development",
-    description: "Learning to code, solving problems, and documenting the journey.",
-    icon: "⌘",
-  },
-  {
-    title: "Projects",
-    description: "Building tools, experimenting with technology, and sharing results.",
-    icon: "◈",
-  },
-  {
-    title: "Life",
-    description: "Thoughts, experiences, and lessons beyond the keyboard.",
-    icon: "✎",
-  },
-];
 
 const recentPosts = (await getCollection(
   'blog',
@@ -57,16 +40,18 @@ const recentPosts = (await getCollection(
   <!-- Categories Section -->
   <section id="topics" class="topics">
     <h2>What you'll find here</h2>
-
     <div class="category-grid">
-      {categories.map((category) => (
-        <article class="category">
-          <span class="category-icon">{category.icon}</span>
-          <h3>{category.title}</h3>
-          <p>{category.description}</p>
-        </article>
-      ))}
+          {categories.map((category) => (
+            <article class="category">
+              <span class="category-icon">{category.icon}</span>
+              <h3>{category.title}</h3>
+              <p>{category.description}</p>
+            </article>
+          ))}
     </div>
+
+
+
   </section>
 
   <!-- About Section -->

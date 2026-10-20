@@ -337,11 +337,38 @@ footer {
   text-decoration: underline;
 }
 
+
+/* Code blocks */
+
 .post-content pre {
-  background: #171e28;
-  padding: 20px;
+  margin: 28px 0;
+  padding: 22px;
+  border: 1px solid #303947;
   border-radius: 10px;
   overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  tab-size: 4;
+}
+
+.post-content pre code {
+  font-family:
+    "JetBrains Mono",
+    "Cascadia Code",
+    ui-monospace,
+    monospace;
+  font-size: inherit;
+  background: transparent;
+  padding: 0;
+}
+
+.post-content pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.post-content pre::-webkit-scrollbar-thumb {
+  background: #465367;
+  border-radius: 4px;
 }
 
 .post-content code {

@@ -1,86 +1,177 @@
+
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-import PostCard from '../components/PostCard.astro';
-import { categories, getCategoryUrl } from "..//lib/categories";
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
 
-const siteName = "Automating Cats";
+import {
+  categories,
+  getCategoryUrl,
+} from "../lib/categories";
 
-const recentPosts = (await getCollection(
-  'blog',
+const posts = (await getCollection(
+  "blog",
   ({ data }) => !data.draft
-))
-  .sort((a, b) =>
-  b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
- )
-  .slice(0, 3);
-
+)).sort(
+  (a, b) =>
+    b.data.pubDate.valueOf() -
+    a.data.pubDate.valueOf()
+);
 ---
 
 <BaseLayout
-  title="Home"
-  description="My journey through development, automation, and life."
+  title="Journal"
+  description="Articles about development, automation, projects, and life."
 >
-  <!-- Hero Section -->
-  <section class="hero">
-    <p class="eyebrow">DEVELOPMENT / AUTOMATION / LIFE</p>
+  <section class="journal-header">
+    <p class="eyebrow">THE JOURNAL</p>
 
-    <h1>Learning in public<span>.</span></h1>
+    <h1>Writing & Reflections<span>.</span></h1>
 
     <p class="intro">
-      Automating what I can. Learning what I can't.
-      Writing about everything in between.
+      Notes from my development journey, projects,
+      troubleshooting experiences, and life.
     </p>
+  </section>
 
-    <a href="#topics" class="explore">
-      Explore the journal →
+  <!-- Category Navigation -->
+  <nav
+    class="category-navigation"
+    aria-label="Journal categories"
+  >
+    <a href="/blog/" class="active" aria-current="page">
+      All Articles
     </a>
-  </section>
 
-  <!-- Categories Section -->
-  <section id="topics" class="topics">
-    <h2>What you'll find here</h2>
-    <div class="category-grid">
-          {categories.map((category) => (
-            <article class="category">
-              <span class="category-icon">{category.icon}</span>
-              <h3>{category.title}</h3>
-              <p>{category.description}</p>
-            </article>
-          ))}
-    </div>
+    {categories.map((category) => (
+      <a href={getCategoryUrl(category.slug)}>
+        {category.name}
+      </a>
+    ))}
+  </nav>
 
+  <!-- Journal Search -->
+  <section class="journal-search" aria-label="Search journal">
+    <label for="post-search">Search articles</label>
 
+    <input
+      type="search"
+      id="post-search"
+      placeholder="Search articles, categories, or tags..."
+      autocomplete="off"
+    />
 
-  </section>
-
-  <!-- About Section -->
-  <section id="about" class="about">
-    <h2>A little about this journal</h2>
-
-    <p>
-      This is a space to document what I'm learning,
-      share the challenges I encounter, and reflect
-      on the things that matter along the way.
+    <p id="search-count" role="status" aria-live="polite">
+      {posts.length} articles
     </p>
   </section>
 
-  <!--Latest Writing Section -->
-  <<section id="lastest" class="latest-writing">
-    <div class="section-heading">
-      <h2>Latest Writing</h2>
-      <a href="/blog/">View all writing</a>
-    </div>
-
-    {recentPosts.length > 0 ? (
-    <div class="recent-posts">
-      {recentPosts.map((post) => (
-      <PostCard post={post} />
-      ))}
-    </div>
+  <!-- Article List -->
+  <section class="journal-list">
+    {posts.length === 0 ? (
+      <p>No published articles yet.</p>
     ) : (
-    <p>New journal entries are coming soon</p>
+      posts.map((post) => (
+        <article
+          class="journal-entry"
+          data-search={[
+            post.data.title,
+            post.data.description,
+            post.data.category,
+            ...post.data.tags,
+          ].join(" ")}
+        >
+          <div class="entry-meta">
+            <span>{post.data.category}</span>
+
+            <time datetime={post.data.pubDate.toISOString()}>
+              {post.data.pubDate.toLocaleDateString(
+                "en-US",
+                {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  timeZone: "UTC",
+                }
+              )}
+            </time>
+          </div>
+
+          <h2>
+            <a href={`/blog/${post.id}/`}>
+              {post.data.title}
+            </a>
+          </h2>
+
+          <p>{post.data.description}</p>
+
+          <a
+            class="read-more"
+            href={`/blog/${post.id}/`}
+          >
+            Read article →
+          </a>
+        </article>
+      ))
     )}
+
+    <p id="no-results" hidden>
+      No articles match your search.
+    </p>
   </section>
 </BaseLayout>
+
+<script>
+  const searchInput = document.querySelector<HTMLInputElement>(
+    "#post-search"
+  );
+
+  const articleElements = Array.from(
+    document.querySelectorAll<HTMLElement>(
+      ".journal-entry"
+    )
+  );
+
+  const countElement = document.querySelector<HTMLElement>(
+    "#search-count"
+  );
+
+  const noResultsElement = document.querySelector<HTMLElement>(
+    "#no-results"
+  );
+
+  function filterArticles() {
+    if (!searchInput) return;
+
+    const query = searchInput.value
+      .trim()
+      .toLowerCase();
+
+    let visibleCount = 0;
+
+    for (const article of articleElements) {
+      const searchableText = (
+        article.dataset.search ?? ""
+      ).toLowerCase();
+
+      const matches = searchableText.includes(query);
+
+      article.hidden = !matches;
+
+      if (matches) {
+        visibleCount++;
+      }
+    }
+
+    if (countElement) {
+      countElement.textContent =
+        `${visibleCount} matching articles`;
+    }
+
+    if (noResultsElement) {
+      noResultsElement.hidden = visibleCount !== 0;
+    }
+  }
+
+  searchInput?.addEventListener("input", filterArticles);
+</script>
 

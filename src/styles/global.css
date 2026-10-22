@@ -563,3 +563,56 @@ footer {
   outline-offset: 4px;
 }
 
+
+/* Journal search */
+
+.journal-search {
+  max-width: 760px;
+  margin: 0 0 50px;
+}
+
+.journal-search label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #f0f3f8;
+}
+
+.journal-search input {
+  width: 100%;
+  padding: 16px 20px;
+  background: #171e28;
+  color: #f0f3f8;
+  border: 1px solid #303947;
+  border-radius: 10px;
+  font: inherit;
+}
+
+.journal-search input::placeholder {
+  color: #8c99a7;
+}
+
+.journal-search input:focus {
+  outline: 2px solid #8bb9dc;
+  outline-offset: 2px;
+}
+
+#search-count {
+  margin-top: 12px;
+  color: #8c99a7;
+  font-size: 0.85rem;
+}
+
+#no-results {
+  padding: 30px;
+  text-align: center;
+  color: #b3bfca;
+}
+
+/* Ensure filtered articles remain hidden */
+
+.journal-entry[hidden],
+#no-results[hidden] {
+  display: none;
+}
+
